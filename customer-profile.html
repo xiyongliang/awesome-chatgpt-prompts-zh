@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户画像 - 旧爱转盘1010</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f7f8fa;
+            color: #1f2329;
+            padding-bottom: 80px;
+        }
+
+        /* 头部导航 */
+        .header {
+            background: #fff;
+            padding: 16px;
+            border-bottom: 1px solid #e5e6eb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-right {
+            width: 32px;
+        }
+
+        /* 客户信息卡片 */
+        .customer-info {
+            background: #fff;
+            margin: 12px;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .customer-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .customer-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .customer-basic {
+            flex: 1;
+        }
+
+        .customer-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .customer-id {
+            font-size: 14px;
+            color: #646a73;
+        }
+
+        .customer-level {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .level-A { background: #fff1f0; color: #ff4d4f; }
+        .level-B { background: #fff7e6; color: #fa8c16; }
+        .level-C { background: #e6f7ff; color: #1890ff; }
+        .level-D { background: #f6ffed; color: #52c41a; }
+        .level-E { background: #f5f5f5; color: #8c8c8c; }
+
+        .customer-meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f1f3;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            color: #8f959e;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 角色切换标签 */
+        .role-tabs {
+            display: flex;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #fff;
+            border-bottom: 1px solid #e5e6eb;
+        }
+
+        .role-tab {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e5e6eb;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .role-tab:hover {
+            border-color: #3370ff;
+            color: #3370ff;
+        }
+
+        .role-tab.active {
+            background: #3370ff;
+            color: #fff;
+            border-color: #3370ff;
+        }
+
+        /* 标签区域容器 */
+        .tag-section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tag-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 标签模块 */
+        .tag-module {
+            background: #fff;
+            margin: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #f7f8fa;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .module-header.required::before {
+            content: '*';
+            color: #ff4d4f;
+            margin-right: 4px;
+            font-weight: 600;
+        }
+
+        .module-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .module-icon {
+            font-size: 18px;
+        }
+
+        .collapse-icon {
+            font-size: 14px;
+            color: #8f959e;
+            transition: transform 0.3s;
+        }
+
+        .module-header.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .module-content {
+            padding: 16px;
+        }
+
+        .module-content.collapsed {
+            display: none;
+        }
+
+        /* 标签组 */
+        .tag-group {
+            margin-bottom: 20px;
+        }
+
+        .tag-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .tag-group-label {
+            font-size: 14px;
+            color: #646a73;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-item {
+            padding: 8px 16px;
+            border: 1px solid #e5e6eb;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+            background: #fff;
+        }
+
+        .tag-item:hover {
+            border-color: #3370ff;
+            color: #3370ff;
+        }
+
+        .tag-item.selected {
+            background: #3370ff;
+            color: #fff;
+            border-color: #3370ff;
+        }
+
+        .tag-item.small {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        /* 表情符号标签 */
+        .tag-item.emoji {
+            font-size: 16px;
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        /* 输入框 */
+        .input-field {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e5e6eb;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3370ff;
+            box-shadow: 0 0 0 2px rgba(51, 112, 255, 0.1);
+        }
+
+        textarea.input-field {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* 时间选择器 */
+        .datetime-picker {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: #f7f8fa;
+            border-radius: 6px;
+        }
+
+        .datetime-picker.show {
+            display: block;
+        }
+
+        .datetime-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .datetime-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .datetime-row label {
+            flex: 0 0 60px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #646a73;
+        }
+
+        .datetime-row input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e5e6eb;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* 快捷短语 */
+        .quick-phrases {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quick-phrase {
+            padding: 6px 12px;
+            background: #f7f8fa;
+            border: 1px solid #e5e6eb;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-phrase:hover {
+            background: #e5e6eb;
+        }
+
+        /* 统计信息 */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f7f8fa;
+            border-radius: 6px;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #3370ff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #8f959e;
+            margin-top: 4px;
+        }
+
+        /* 已添加标签展示 */
+        .added-tags {
+            background: #fff;
+            margin: 12px;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .added-tags-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1f2329;
+        }
+
+        .added-tag-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: #f7f8fa;
+            border-radius: 6px;
+        }
+
+        .added-tag-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .added-tag-info {
+            flex: 1;
+        }
+
+        .added-tag-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .added-tag-meta {
+            font-size: 12px;
+            color: #8f959e;
+        }
+
+        .remove-tag {
+            padding: 4px 8px;
+            color: #ff4d4f;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* 底部操作栏 */
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            padding: 12px 16px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary {
+            background: #f7f8fa;
+            color: #646a73;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e6eb;
+        }
+
+        .btn-primary {
+            background: #3370ff;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #2b5fd9;
+        }
+
+        /* 徽章 */
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .badge-success { background: #e6f7ff; color: #1890ff; }
+        .badge-warning { background: #fff7e6; color: #fa8c16; }
+        .badge-danger { background: #fff1f0; color: #ff4d4f; }
+
+        /* 分割线 */
+        .divider {
+            height: 1px;
+            background: #e5e6eb;
+            margin: 16px 0;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8f959e;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+
+        /* 吐司提示 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+            animation: toastFade 2s;
+        }
+
+        @keyframes toastFade {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <div class="header">
+        <div class="header-content">
+            <div class="back-btn" onclick="history.back()">←</div>
+            <div class="header-title">客户画像</div>
+            <div class="header-right"></div>
+        </div>
+    </div>
+
+    <!-- 客户信息卡片 -->
+    <div class="customer-info">
+        <div class="customer-header">
+            <div class="customer-avatar">王</div>
+            <div class="customer-basic">
+                <div class="customer-name">
+                    王女士
+                    <span class="customer-level level-A" id="customerLevel">A级线索</span>
+                </div>
+                <div class="customer-id">客户ID: C20231105001</div>
+            </div>
+        </div>
+        <div class="customer-meta">
+            <div class="meta-item">
+                <div class="meta-label">联系方式</div>
+                <div class="meta-value">138****8888</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">首次联系</div>
+                <div class="meta-value">2023-11-01</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">跟进次数</div>
+                <div class="meta-value">5次</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 角色切换 -->
+    <div class="role-tabs">
+        <div class="role-tab active" onclick="switchRole('appraiser')">
+            🔍 鉴定师打标签
+        </div>
+        <div class="role-tab" onclick="switchRole('service')">
+            💬 客服打标签
+        </div>
+    </div>
+
+    <!-- 鉴定师标签区域 -->
+    <div class="tag-section active" id="appraiserSection">
+        <!-- 商品信息模块 -->
+        <div class="tag-module">
+            <div class="module-header required" onclick="toggleModule(this)">
+                <div class="module-title">
+                    <span class="module-icon">📦</span>
+                    商品信息
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="module-content">
+                <div class="tag-group">
+                    <div class="tag-group-label">物品类别</div>
+                    <div class="tag-list">
+                        <div class="tag-item" onclick="selectTag(this, 'single')">👜 包袋</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">⌚ 腕表</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">💎 珠宝</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">👔 服装</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">👟 鞋履</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">🕶️ 配饰</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">购买时间</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">1年内</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">1-3年</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">3-5年</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">5年以上</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">不清楚</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">购买渠道</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">专柜</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">官网</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">代购</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">礼物</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">二手</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">不明</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">成色评估</div>
+                    <div class="tag-list">
+                        <div class="tag-item" onclick="selectTag(this, 'single')">S级 (全新)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">A级 (98新)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">B级 (95新)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">C级 (90新)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">D级 (85新)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">E级 (需维修)</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">附件完整度</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">全套齐全</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">主要附件</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">部分附件</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">无附件</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">鉴定备注</div>
+                    <textarea class="input-field" placeholder="请输入商品的详细描述、瑕疵说明等..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 报价信息模块 -->
+        <div class="tag-module">
+            <div class="module-header" onclick="toggleModule(this)">
+                <div class="module-title">
+                    <span class="module-icon">💰</span>
+                    报价信息
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="module-content">
+                <div class="tag-group">
+                    <div class="tag-group-label">报价金额</div>
+                    <input type="text" class="input-field" placeholder="请输入报价金额（元）">
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">市场行情了解</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">非常了解</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">略有了解</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">不太了解</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">完全不懂</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">报价满意度</div>
+                    <div class="tag-list">
+                        <div class="tag-item emoji" onclick="selectTag(this, 'single')">😊 非常满意</div>
+                        <div class="tag-item emoji" onclick="selectTag(this, 'single')">🙂 满意</div>
+                        <div class="tag-item emoji" onclick="selectTag(this, 'single')">😐 中性</div>
+                        <div class="tag-item emoji" onclick="selectTag(this, 'single')">🙁 不满意</div>
+                        <div class="tag-item emoji" onclick="selectTag(this, 'single')">😤 很不满意</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 客服标签区域 -->
+    <div class="tag-section" id="serviceSection">
+        <!-- 接触情况模块 -->
+        <div class="tag-module">
+            <div class="module-header required" onclick="toggleModule(this)">
+                <div class="module-title">
+                    <span class="module-icon">📞</span>
+                    接触情况
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="module-content">
+                <div class="tag-group">
+                    <div class="tag-group-label">接触结果</div>
+                    <div class="tag-list">
+                        <div class="tag-item" onclick="selectTag(this, 'single')">✅ 成功接通</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">💬 微信沟通</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">📵 未接听</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">⏰ 忙稍后联系</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">🚫 拒接</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">❌ 空号</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">线索等级</div>
+                    <div class="tag-list">
+                        <div class="tag-item" onclick="selectTag(this, 'single'); updateCustomerLevel('A')">🔥 A级 (3天内)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single'); updateCustomerLevel('B')">⭐ B级 (1周内)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single'); updateCustomerLevel('C')">💡 C级 (仅询价)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single'); updateCustomerLevel('D')">🤔 D级 (比价中)</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single'); updateCustomerLevel('E')">❄️ E级 (随便问问)</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">客户背景</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">个人闲置</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">职业卖家</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">礼物变现</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">情感原因</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">资金周转</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">搬家清理</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 沟通跟进模块 -->
+        <div class="tag-module">
+            <div class="module-header required" onclick="toggleModule(this)">
+                <div class="module-title">
+                    <span class="module-icon">💬</span>
+                    沟通跟进
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="module-content">
+                <div class="tag-group">
+                    <div class="tag-group-label">出手原因</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">紧急周转</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">换新款</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">使用率低</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">断舍离</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">情感原因</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">搬家移民</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">客户态度</div>
+                    <div class="tag-list">
+                        <div class="tag-item" onclick="selectTag(this, 'single')">⚡ 果断型</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">🤓 理性型</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">🤔 犹豫型</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">📊 对比型</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">😶 冷淡型</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">😠 情绪型</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">竞争态势</div>
+                    <div class="tag-list">
+                        <div class="tag-item" onclick="selectTag(this, 'single')">✨ 独家询价</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">🔄 正在对比</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">📋 已有报价</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">⚠️ 倾向他家</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">❌ 已成交</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">客户关注点</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">💰 价格因素</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">📝 流程问题</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">🔒 安全顾虑</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">⚡ 到账速度</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">🏆 品牌信任</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'multiple')">😊 服务体验</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 意向判断模块 -->
+        <div class="tag-module">
+            <div class="module-header" onclick="toggleModule(this)">
+                <div class="module-title">
+                    <span class="module-icon">🎯</span>
+                    意向判断
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="module-content collapsed">
+                <div class="tag-group">
+                    <div class="tag-group-label">预约状态</div>
+                    <div class="tag-list">
+                        <div class="tag-item" onclick="selectTag(this, 'single')">✅ 已确定预约</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">⏳ 待定预约</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">❌ 暂不预约</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">交易方式</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">🚗 上门回收</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">🏪 到店交易</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">📦 快递邮寄</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">成交把握度</div>
+                    <div class="tag-list">
+                        <div class="tag-item" onclick="selectTag(this, 'single')">🔥 90%+</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">⭐ 70-90%</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">💡 50-70%</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">🤔 30-50%</div>
+                        <div class="tag-item" onclick="selectTag(this, 'single')">❄️ <30%</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">意向变化</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">📈 意向增强</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">➡️ 意向稳定</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">📉 意向减弱</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 下次跟进模块 -->
+        <div class="tag-module">
+            <div class="module-header required" onclick="toggleModule(this)">
+                <div class="module-title">
+                    <span class="module-icon">⏰</span>
+                    下次跟进
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="module-content">
+                <div class="tag-group">
+                    <div class="tag-group-label">跟进策略</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">🔥 高频跟进(每天)</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">📅 定期跟进(每周2-3次)</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">📆 长线跟进(每月1-2次)</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">⏰ 节点跟进</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">❄️ 冷冻保护</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">跟进时间</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">2小时后</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">今天</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">明天</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">3天后</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">一周后</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">两周后</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">一个月后</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single'); toggleDatetimePicker()">📅 自定义时间</div>
+                    </div>
+                </div>
+
+                <div class="datetime-picker" id="datetimePicker">
+                    <div class="datetime-row">
+                        <label>日期:</label>
+                        <input type="date" class="input-field">
+                    </div>
+                    <div class="datetime-row">
+                        <label>时间:</label>
+                        <input type="time" class="input-field">
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">跟进方式</div>
+                    <div class="tag-list">
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">📞 电话</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">💬 微信</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">🚗 上门</div>
+                        <div class="tag-item small" onclick="selectTag(this, 'single')">📹 视频</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">跟进任务</div>
+                    <textarea class="input-field" placeholder="请输入下次跟进的具体任务..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 备注说明模块 -->
+        <div class="tag-module">
+            <div class="module-header" onclick="toggleModule(this)">
+                <div class="module-title">
+                    <span class="module-icon">📝</span>
+                    备注说明
+                </div>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="module-content collapsed">
+                <div class="tag-group">
+                    <div class="tag-group-label">快捷短语</div>
+                    <div class="quick-phrases">
+                        <div class="quick-phrase" onclick="addQuickPhrase('需考虑')">需考虑</div>
+                        <div class="quick-phrase" onclick="addQuickPhrase('比价中')">比价中</div>
+                        <div class="quick-phrase" onclick="addQuickPhrase('价格异议')">价格异议</div>
+                        <div class="quick-phrase" onclick="addQuickPhrase('信任问题')">信任问题</div>
+                        <div class="quick-phrase" onclick="addQuickPhrase('需商量')">需商量</div>
+                        <div class="quick-phrase" onclick="addQuickPhrase('观望中')">观望中</div>
+                    </div>
+                </div>
+
+                <div class="tag-group">
+                    <div class="tag-group-label">详细备注</div>
+                    <textarea class="input-field" id="remarkText" placeholder="请输入详细备注信息..."></textarea>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">15 分钟</div>
+                        <div class="stat-label">通话时长</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">5 次</div>
+                        <div class="stat-label">累计跟进</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4 天</div>
+                        <div class="stat-label">线索天数</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 已添加标签 -->
+    <div class="added-tags">
+        <div class="added-tags-title">本次已添加标签 (<span id="tagCount">0</span>)</div>
+        <div id="addedTagsList">
+            <div class="empty-state">
+                <div class="empty-icon">🏷️</div>
+                <div class="empty-text">暂无添加标签</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="bottom-actions">
+        <button class="btn btn-secondary" onclick="saveDraft()">💾 保存草稿</button>
+        <button class="btn btn-primary" onclick="submitTags()">✅ 提交标签</button>
+    </div>
+
+    <!-- 吐司提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 全局数据
+        let addedTags = [];
+        let currentRole = 'appraiser';
+
+        // 切换角色
+        function switchRole(role) {
+            currentRole = role;
+
+            // 更新tab样式
+            document.querySelectorAll('.role-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 切换内容区域
+            document.querySelectorAll('.tag-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            if (role === 'appraiser') {
+                document.getElementById('appraiserSection').classList.add('active');
+            } else {
+                document.getElementById('serviceSection').classList.add('active');
+            }
+        }
+
+        // 展开/折叠模块
+        function toggleModule(header) {
+            header.classList.toggle('collapsed');
+            const content = header.nextElementSibling;
+            content.classList.toggle('collapsed');
+        }
+
+        // 选择标签
+        function selectTag(element, mode) {
+            const groupElement = element.closest('.tag-group');
+            const groupLabel = groupElement.querySelector('.tag-group-label').textContent;
+            const tagText = element.textContent.trim();
+
+            if (mode === 'single') {
+                // 单选模式：先清除同组其他选中
+                groupElement.querySelectorAll('.tag-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                element.classList.add('selected');
+
+                // 移除同组的其他标签
+                addedTags = addedTags.filter(tag => tag.group !== groupLabel);
+            } else {
+                // 多选模式
+                element.classList.toggle('selected');
+            }
+
+            // 添加或移除标签
+            if (element.classList.contains('selected')) {
+                addedTags.push({
+                    group: groupLabel,
+                    text: tagText,
+                    role: currentRole,
+                    time: new Date().toLocaleString()
+                });
+            } else {
+                addedTags = addedTags.filter(tag =>
+                    !(tag.group === groupLabel && tag.text === tagText)
+                );
+            }
+
+            updateAddedTagsList();
+        }
+
+        // 更新已添加标签列表
+        function updateAddedTagsList() {
+            const container = document.getElementById('addedTagsList');
+            const countElement = document.getElementById('tagCount');
+
+            countElement.textContent = addedTags.length;
+
+            if (addedTags.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🏷️</div>
+                        <div class="empty-text">暂无添加标签</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = addedTags.map((tag, index) => `
+                <div class="added-tag-item">
+                    <div class="added-tag-info">
+                        <div class="added-tag-name">
+                            ${tag.text}
+                            <span class="badge ${tag.role === 'appraiser' ? 'badge-success' : 'badge-warning'}">
+                                ${tag.role === 'appraiser' ? '鉴定师' : '客服'}
+                            </span>
+                        </div>
+                        <div class="added-tag-meta">${tag.group} · ${tag.time}</div>
+                    </div>
+                    <div class="remove-tag" onclick="removeTag(${index})">×</div>
+                </div>
+            `).join('');
+        }
+
+        // 移除标签
+        function removeTag(index) {
+            const tag = addedTags[index];
+
+            // 取消UI上的选中状态
+            document.querySelectorAll('.tag-item').forEach(item => {
+                if (item.textContent.trim() === tag.text) {
+                    item.classList.remove('selected');
+                }
+            });
+
+            addedTags.splice(index, 1);
+            updateAddedTagsList();
+            showToast('标签已移除');
+        }
+
+        // 更新客户等级
+        function updateCustomerLevel(level) {
+            const levelElement = document.getElementById('customerLevel');
+            const levelText = {
+                'A': 'A级线索',
+                'B': 'B级线索',
+                'C': 'C级线索',
+                'D': 'D级线索',
+                'E': 'E级线索'
+            };
+
+            levelElement.textContent = levelText[level];
+            levelElement.className = 'customer-level level-' + level;
+        }
+
+        // 切换日期时间选择器
+        function toggleDatetimePicker() {
+            const picker = document.getElementById('datetimePicker');
+            picker.classList.toggle('show');
+        }
+
+        // 添加快捷短语
+        function addQuickPhrase(phrase) {
+            const textarea = document.getElementById('remarkText');
+            if (textarea.value) {
+                textarea.value += '；' + phrase;
+            } else {
+                textarea.value = phrase;
+            }
+            showToast('已添加: ' + phrase);
+        }
+
+        // 保存草稿
+        function saveDraft() {
+            const data = {
+                tags: addedTags,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('customerProfileDraft', JSON.stringify(data));
+            showToast('草稿已保存');
+        }
+
+        // 提交标签
+        function submitTags() {
+            if (addedTags.length === 0) {
+                showToast('请至少选择一个标签');
+                return;
+            }
+
+            // 这里应该调用API提交数据
+            console.log('提交标签数据:', addedTags);
+
+            showToast('标签提交成功');
+
+            // 清空数据
+            setTimeout(() => {
+                addedTags = [];
+                document.querySelectorAll('.tag-item.selected').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                updateAddedTagsList();
+                localStorage.removeItem('customerProfileDraft');
+            }, 1500);
+        }
+
+        // 显示提示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // 页面加载时恢复草稿
+        window.addEventListener('load', () => {
+            const draft = localStorage.getItem('customerProfileDraft');
+            if (draft) {
+                const data = JSON.parse(draft);
+                addedTags = data.tags || [];
+
+                // 恢复UI选中状态
+                addedTags.forEach(tag => {
+                    document.querySelectorAll('.tag-item').forEach(item => {
+                        if (item.textContent.trim() === tag.text) {
+                            item.classList.add('selected');
+                        }
+                    });
+                });
+
+                updateAddedTagsList();
+                showToast('已恢复草稿');
+            }
+        });
+
+        // 自动保存
+        let autoSaveTimer;
+        document.addEventListener('input', () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                saveDraft();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
